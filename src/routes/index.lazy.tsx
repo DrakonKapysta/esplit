@@ -7,7 +7,7 @@ export const Route = createLazyFileRoute("/")({
 
 function IndexPage() {
   return (
-    <div className="text-center p-4 border rounded-md shadow flex-1">
+    <div className="text-center p-4 border rounded-md shadow flex-1 flex flex-col">
       <h1>Index Page</h1>
       <p>This is the index page</p>
       <Link to="/profile">Profile</Link>

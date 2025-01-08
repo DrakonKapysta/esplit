@@ -27,7 +27,7 @@ function RootComponent() {
     <main className="min-h-screen flex flex-col ">
       <div className="flex gap-2 border flex-1">
         <aside className="flex flex-col p-4 max-w-40 w-full gap-4">
-          <h2 className="text-2xl mb-4">Sidebar</h2>
+          <h2 className="text-2xl mb-4 text-teal-500">Esplit</h2>
           {routeConstants.map((route) => (
             <SidebarLink key={route.id} {...route} />
           ))}

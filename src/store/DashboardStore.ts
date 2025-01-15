@@ -1,4 +1,9 @@
-import { Priority, SectionType, TaskType } from "@/types/taskType";
+import {
+  Priority,
+  SectionType,
+  TaskPosition,
+  TaskType,
+} from "@/types/taskType";
 import { create } from "zustand";
 
 interface DashboardStoreState {
@@ -8,6 +13,12 @@ interface DashboardStoreState {
   isDragging: boolean;
   draggingOverId: string | null;
   addTaskToSection: (task: TaskType, sectionId: string) => void;
+  addTaskOnPosition: (
+    task: TaskType,
+    sectionId: string,
+    position: TaskPosition,
+    taskId?: string
+  ) => void;
   removeTaskFromSection: (taskId: string, sectionId: string) => TaskType | null;
   setDraggingTaskId: (taskId: string) => void;
   setFromSectionId: (sectionId: string) => void;
@@ -119,6 +130,29 @@ export const useDashboardStore = create<DashboardStoreState>()((set) => ({
   setDraggingOverId: (sectionId: string | null) => {
     set(() => ({
       draggingOverId: sectionId,
+    }));
+  },
+  addTaskOnPosition: (task, sectionId, position: TaskPosition, taskId) => {
+    set((state) => ({
+      sections: state.sections.map((section) => {
+        if (section.id === sectionId) {
+          const startIndex = section.tasks.findIndex(
+            (task) => task.id === taskId
+          );
+          const index =
+            position === TaskPosition.After ? startIndex + 1 : startIndex;
+          return {
+            ...section,
+            tasks: [
+              ...section.tasks.slice(0, index),
+              task,
+              ...section.tasks.slice(index),
+            ],
+          };
+        } else {
+          return section;
+        }
+      }),
     }));
   },
 }));

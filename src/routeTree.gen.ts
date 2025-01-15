@@ -14,6 +14,7 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as ProfileIndexImport } from './routes/profile/index'
+import { Route as AddTaskIndexImport } from './routes/add-task/index'
 
 // Create Virtual Routes
 
@@ -33,6 +34,12 @@ const ProfileIndexRoute = ProfileIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const AddTaskIndexRoute = AddTaskIndexImport.update({
+  id: '/add-task/',
+  path: '/add-task/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -42,6 +49,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/add-task/': {
+      id: '/add-task/'
+      path: '/add-task'
+      fullPath: '/add-task'
+      preLoaderRoute: typeof AddTaskIndexImport
       parentRoute: typeof rootRoute
     }
     '/profile/': {
@@ -58,36 +72,41 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/add-task': typeof AddTaskIndexRoute
   '/profile': typeof ProfileIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/add-task': typeof AddTaskIndexRoute
   '/profile': typeof ProfileIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/add-task/': typeof AddTaskIndexRoute
   '/profile/': typeof ProfileIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/profile'
+  fullPaths: '/' | '/add-task' | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/profile'
-  id: '__root__' | '/' | '/profile/'
+  to: '/' | '/add-task' | '/profile'
+  id: '__root__' | '/' | '/add-task/' | '/profile/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  AddTaskIndexRoute: typeof AddTaskIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  AddTaskIndexRoute: AddTaskIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
 }
 
@@ -102,11 +121,15 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
+        "/add-task/",
         "/profile/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/add-task/": {
+      "filePath": "add-task/index.tsx"
     },
     "/profile/": {
       "filePath": "profile/index.tsx"

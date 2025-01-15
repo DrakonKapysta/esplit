@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { TaskType } from "@/types/taskType";
+import { TaskPosition, TaskType } from "@/types/taskType";
 import React, { ComponentPropsWithoutRef, FC } from "react";
 import { DashboardTask } from "./DashboardTask";
 import { useDashboardStore } from "@/store/DashboardStore";
@@ -15,7 +15,9 @@ export const DashboardTaskList: FC<DashboardTaskListProps> = ({
   className,
   ...props
 }) => {
-  const addTaskToSection = useDashboardStore((state) => state.addTaskToSection);
+  const addTaskOnPosition = useDashboardStore(
+    (state) => state.addTaskOnPosition
+  );
   const removeTaskFromSection = useDashboardStore(
     (state) => state.removeTaskFromSection
   );
@@ -38,11 +40,12 @@ export const DashboardTaskList: FC<DashboardTaskListProps> = ({
             taskIdFrom: string,
             cardIdFrom: string,
             taskIdTo: string,
-            cardIdTo: string
+            cardIdTo: string,
+            position: TaskPosition
           ) => {
             if (!taskIdFrom || !cardIdFrom) return;
             removeTaskFromSection(taskIdFrom, cardIdFrom);
-            addTaskToSection(task, cardIdTo);
+            addTaskOnPosition(task, cardIdTo, position, taskIdTo);
           }}
         />
       ))}

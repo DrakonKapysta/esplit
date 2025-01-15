@@ -3,6 +3,10 @@ export enum Priority {
   Medium = "Medium",
   High = "High",
 }
+export enum TaskPosition {
+  After = "After",
+  Before = "Before",
+}
 
 export interface TaskType {
   id: string;

@@ -1,6 +1,6 @@
 import { useDragging } from "@/hooks/useDragging";
 import { cn } from "@/lib/utils";
-import { Priority, TaskType } from "@/types/taskType";
+import { Priority, TaskPosition, TaskType } from "@/types/taskType";
 import React, { ComponentPropsWithoutRef, FC, useEffect } from "react";
 
 interface DashboardTaskProps extends ComponentPropsWithoutRef<"div"> {
@@ -10,7 +10,8 @@ interface DashboardTaskProps extends ComponentPropsWithoutRef<"div"> {
     taskIdFrom: string,
     cardIdFrom: string,
     taskIdTo: string,
-    cardIdTo: string
+    cardIdTo: string,
+    position: TaskPosition
   ) => void;
 }
 
@@ -49,13 +50,17 @@ export const DashboardTask: FC<DashboardTaskProps> = ({
         ref={taskElementRef}
         onMouseDown={handleMouseDown}
         {...props}
-        className={cn("p-2 border rounded shadow", className, {
-          hidden: isDragging,
-          "select-none": isDragging,
-        })}
+        className={cn(
+          "p-2 border rounded shadow hover:ring-1 hover:ring-offset-1",
+          className,
+          {
+            hidden: isDragging,
+            "select-none": isDragging,
+          }
+        )}
       >
-        <p>{task.description}</p>
-
+        <p className="inline-block">{task.description}</p>
+        <br />
         <span
           aria-label={`Task priority: ${task.priority}`}
           className={cn("text-sm", priorityStyle)}

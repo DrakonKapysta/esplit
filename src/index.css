@@ -6,6 +6,9 @@ html,
 body {
   height: 100%;
 }
+.no-select {
+  user-select: none;
+}
 
 @layer base {
   :root {

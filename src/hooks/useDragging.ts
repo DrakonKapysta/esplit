@@ -1,5 +1,5 @@
 import { useDashboardStore } from "@/store/DashboardStore";
-import { TaskType } from "@/types/taskType";
+import { TaskPosition, TaskType } from "@/types/taskType";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export function useDragging(
@@ -9,7 +9,8 @@ export function useDragging(
     taskIdFrom: string,
     cardIdFrom: string,
     taskIdTo: string,
-    cardIdTo: string
+    cardIdTo: string,
+    position: TaskPosition
   ) => void
 ) {
   const [isDragging, setIsDragging] = useState(false);
@@ -27,7 +28,7 @@ export function useDragging(
 
   useEffect(() => {
     if (!isDragging) return;
-
+    document.body.classList.add("no-select");
     const handleMouseMove = (e: MouseEvent) => {
       animationFrameRef.current = requestAnimationFrame(() => {
         setDragPosition({ x: e.clientX, y: e.clientY });
@@ -65,12 +66,26 @@ export function useDragging(
       if (elementUnderCursor) {
         const closestCard = elementUnderCursor.closest("[data-task-id]");
         if (closestCard) {
+          const closesCardCoords = closestCard.getBoundingClientRect();
+
+          const closesCardCenterY =
+            closesCardCoords.y + closesCardCoords.height / 2;
+
+          let taskPosition = null;
+
+          if (e.clientY >= closesCardCenterY) {
+            taskPosition = TaskPosition.After;
+          } else {
+            taskPosition = TaskPosition.Before;
+          }
+
           if (onDrop && dragElementRef.current)
             onDrop(
               task.id || "",
               cardId || "",
               closestCard.getAttribute("data-task-id") || "",
-              closestCard.getAttribute("data-card-id") || ""
+              closestCard.getAttribute("data-card-id") || "",
+              taskPosition
             );
         } else {
           const closestSection = elementUnderCursor.closest("[data-card-id]");
@@ -86,6 +101,7 @@ export function useDragging(
       } else {
         console.warn("No element under cursor");
       }
+      document.body.classList.remove("no-select");
     };
 
     document.addEventListener("mousemove", handleMouseMove);
@@ -94,8 +110,19 @@ export function useDragging(
     return () => {
       document.removeEventListener("mousemove", handleMouseMove);
       document.removeEventListener("mouseup", handleMouseUp);
+      document.body.classList.remove("no-select");
     };
-  }, [isDragging]);
+  }, [
+    isDragging,
+    dragPosition,
+    dragElementRef,
+    onDrop,
+    task,
+    cardId,
+    addTaskToSection,
+    removeTaskFromSection,
+    setDraggingOverId,
+  ]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     setIsDragging(true);

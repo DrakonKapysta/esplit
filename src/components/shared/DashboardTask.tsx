@@ -1,8 +1,17 @@
 import { useDragging } from "@/hooks/useDragging";
 import { cn } from "@/lib/utils";
-import { Priority, TaskPosition, TaskType } from "@/types/taskType";
+import {
+  Priority,
+  TaskPosition,
+  TaskType,
+  TaskTypeWithSection,
+} from "@/types/taskType";
 import React, { ComponentPropsWithoutRef, FC, useEffect } from "react";
-
+import { Settings } from "lucide-react";
+import { Modal } from "./Modal";
+import { DashboardTaskForm, Form } from "./DashboardTaskForm";
+import { useDashboardStore } from "@/store/DashboardStore";
+import { Button } from "../ui/button";
 interface DashboardTaskProps extends ComponentPropsWithoutRef<"div"> {
   task: TaskType;
   cardId: string;
@@ -29,8 +38,11 @@ export const DashboardTask: FC<DashboardTaskProps> = ({
   ...props
 }) => {
   const priorityStyle = priorityStyles[task.priority] || "text-gray-500";
+  const updateTask = useDashboardStore((state) => state.updateTask);
+  const deleteTask = useDashboardStore((state) => state.deleteTask);
 
   const [dragWidth, setDragWidth] = React.useState<number | null>(null);
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
   const { dragElementRef, handleMouseDown, isDragging, dragPosition } =
     useDragging(task, cardId, onTaskDrop);
 
@@ -41,6 +53,18 @@ export const DashboardTask: FC<DashboardTaskProps> = ({
       setDragWidth(taskElementRef.current.getBoundingClientRect().width);
     }
   }, []);
+  const handleModalClose = () => setIsModalOpen(false);
+  const handleModalOpen = () => setIsModalOpen(true);
+  const onSubmit = (data: Form) => {
+    if (data.id && data.sectionId) {
+      updateTask(data as TaskTypeWithSection);
+      handleModalClose();
+    }
+  };
+  const onDelete = () => {
+    deleteTask(task.id, cardId);
+    handleModalClose();
+  };
 
   return (
     <>
@@ -61,13 +85,37 @@ export const DashboardTask: FC<DashboardTaskProps> = ({
       >
         <p className="inline-block">{task.description}</p>
         <br />
-        <span
-          aria-label={`Task priority: ${task.priority}`}
-          className={cn("text-sm", priorityStyle)}
-        >
-          {task.priority} priority
-        </span>
+        <div className="flex justify-between items-end">
+          <span
+            aria-label={`Task priority: ${task.priority}`}
+            className={cn("text-sm", priorityStyle)}
+          >
+            {task.priority} priority
+          </span>
+          <button
+            onClick={() => {
+              handleModalOpen();
+            }}
+            className=" p-1"
+          >
+            <Settings color="gray" size={16} className="pointer-events-none" />
+          </button>
+        </div>
       </div>
+      <Modal isOpen={isModalOpen} onClose={handleModalClose}>
+        <DashboardTaskForm
+          update={true}
+          formValues={{ ...task, sectionId: cardId }}
+          onSubmit={onSubmit}
+        />
+        <Button
+          onClick={onDelete}
+          variant={"destructive"}
+          className="mt-2 w-full"
+        >
+          Delete
+        </Button>
+      </Modal>
       {isDragging && (
         <div
           ref={dragElementRef}

@@ -6,18 +6,25 @@ import { Button } from "../ui/button";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDashboardStore } from "@/store/DashboardStore";
-import { Priority } from "@/types/taskType";
+import { Priority, TaskTypeWithSection } from "@/types/taskType";
 import { v4 } from "uuid";
 import { ArrowUp } from "lucide-react";
 import { CustomSelect } from "./CustomSelect";
 
-type Form = {
+export type Form = {
+  id?: string;
+  sectionId?: string;
   description: string;
   priority: Priority;
 };
 const PrioritySchema = z.nativeEnum(Priority);
 
-interface DashboardTaskFormProps extends ComponentPropsWithoutRef<"form"> {}
+interface DashboardTaskFormProps
+  extends Omit<ComponentPropsWithoutRef<"form">, "onSubmit"> {
+  formValues?: Form;
+  update?: boolean;
+  onSubmit?: (data: Form) => void;
+}
 
 const options = [
   { value: Priority.Low, label: "Low" },
@@ -26,6 +33,8 @@ const options = [
 ];
 
 const formSchema = z.object({
+  id: z.string().optional(),
+  sectionId: z.string().optional(),
   description: z
     .string()
     .min(3, { message: "Description must contain at least 3 character(s)" }),
@@ -35,19 +44,24 @@ const formSchema = z.object({
 export const DashboardTaskForm = React.forwardRef<
   HTMLFormElement,
   DashboardTaskFormProps
->(({ className, ...props }, ref) => {
+>(({ formValues, onSubmit, update, className, ...props }, ref) => {
   const sectionId = useDashboardStore((state) => state.sections)[0].id;
+  const updateTask = useDashboardStore((state) => state.updateTask);
   const addTaskToSection = useDashboardStore((state) => state.addTaskToSection);
   const { register, handleSubmit, formState, reset, control, setValue } =
     useForm<Form>({
-      defaultValues: {
+      defaultValues: formValues || {
         description: "",
         priority: Priority.Low,
       },
       resolver: zodResolver(formSchema),
     });
   const selectedValue = useWatch({ control: control, name: "priority" });
-  const onSubmit = (data: Form) => {
+  const onDefaultSubmit = (data: Form) => {
+    if (update && data.id && data.sectionId) {
+      updateTask(data as TaskTypeWithSection);
+      return;
+    }
     addTaskToSection({ id: v4(), ...data }, sectionId);
     reset();
   };
@@ -67,7 +81,7 @@ export const DashboardTaskForm = React.forwardRef<
         className={cn("flex flex-col gap-2", className)}
         ref={ref}
         action="#"
-        onSubmit={handleSubmit(onSubmit)}
+        onSubmit={handleSubmit(onSubmit || onDefaultSubmit)}
       >
         <Input
           aria-invalid={errors.description ? "true" : "false"}
@@ -82,7 +96,9 @@ export const DashboardTaskForm = React.forwardRef<
           icon={<ArrowUp />}
         />
         <Button disabled={isSubmitting} type="submit">
-          Add Task
+          <span className="pointer-events-none">
+            {update ? "Update" : "Add Task"}
+          </span>
         </Button>
       </form>
     </section>

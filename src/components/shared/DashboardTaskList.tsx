@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 import { TaskPosition, TaskType } from "@/types/taskType";
-import React, { ComponentPropsWithoutRef, FC } from "react";
+import { ComponentPropsWithoutRef, FC } from "react";
 import { DashboardTask } from "./DashboardTask";
 import { useDashboardStore } from "@/store/DashboardStore";
 

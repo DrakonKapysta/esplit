@@ -125,6 +125,8 @@ export function useDragging(
   ]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    const elementTag = (e.target as Element).tagName;
+    if (elementTag === "BUTTON") return;
     setIsDragging(true);
     setDragPosition({ x: e.clientX, y: e.clientY });
   }, []);

@@ -3,6 +3,7 @@ import {
   SectionType,
   TaskPosition,
   TaskType,
+  TaskTypeWithSection,
 } from "@/types/taskType";
 import { create } from "zustand";
 
@@ -24,6 +25,8 @@ interface DashboardStoreState {
   setFromSectionId: (sectionId: string) => void;
   setIsDragging: (isDragIntoSection: boolean) => void;
   setDraggingOverId: (sectionId: string | null) => void;
+  updateTask: (updatedTask: TaskTypeWithSection) => void;
+  deleteTask: (taskId: string, sectionId: string) => void;
 }
 
 const initialState = {
@@ -152,6 +155,37 @@ export const useDashboardStore = create<DashboardStoreState>()((set) => ({
         } else {
           return section;
         }
+      }),
+    }));
+  },
+  updateTask: ({ sectionId, ...upatedTask }: TaskTypeWithSection) => {
+    return set((state) => ({
+      sections: state.sections.map((section) => {
+        if (section.id === sectionId) {
+          return {
+            ...section,
+            tasks: section.tasks.map((task) => {
+              if (task.id === upatedTask.id) {
+                return upatedTask;
+              }
+              return task;
+            }),
+          };
+        }
+        return section;
+      }),
+    }));
+  },
+  deleteTask: (taskId, sectionId) => {
+    return set((state) => ({
+      sections: state.sections.map((section) => {
+        if (section.id == sectionId) {
+          return {
+            ...section,
+            tasks: section.tasks.filter((task) => task.id !== taskId),
+          };
+        }
+        return section;
       }),
     }));
   },

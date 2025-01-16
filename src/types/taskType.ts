@@ -18,6 +18,9 @@ export interface TaskType {
   description: string;
   priority: Priority;
 }
+export interface TaskTypeWithSection extends TaskType {
+  sectionId: string;
+}
 
 export interface SectionType {
   id: string;

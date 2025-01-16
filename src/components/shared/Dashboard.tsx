@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import React, { ComponentPropsWithoutRef, FC } from "react";
+import { ComponentPropsWithoutRef, FC } from "react";
 import { DashboardCard } from "./DashboardCard";
 import { useDashboardStore } from "@/store/DashboardStore";
 import { SectionType } from "@/types/taskType";

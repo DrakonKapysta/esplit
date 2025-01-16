@@ -20,12 +20,6 @@ const routeConstants = [
     icon: <Plus size={22} />,
     text: "Add Task",
   },
-  {
-    id: "profile",
-    path: "/profile",
-    icon: <User size={22} />,
-    text: "Profile",
-  },
 ];
 
 function RootComponent() {

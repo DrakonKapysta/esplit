@@ -8,6 +8,11 @@ export enum TaskPosition {
   Before = "Before",
 }
 
+export type OptionType = {
+  value: Priority;
+  label: string;
+};
+
 export interface TaskType {
   id: string;
   description: string;
